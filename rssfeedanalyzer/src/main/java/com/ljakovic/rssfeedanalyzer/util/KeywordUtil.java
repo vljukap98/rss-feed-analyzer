@@ -1,35 +1,56 @@
 package com.ljakovic.rssfeedanalyzer.util;
 
 import com.apptasticsoftware.rssreader.Item;
-import org.springframework.beans.factory.annotation.Value;
+import edu.stanford.nlp.simple.Sentence;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Component
 public class KeywordUtil {
 
-    @Value("${rss.feed.analyzer.stopwords}")
-    private String stopwords;
+    private static final Pattern URL_PATTERN = Pattern.compile(
+            "https?://[\\w/:%#$&?()~.=\\+\\-]+|www\\.[\\w/:%#$&?()~.=\\+\\-]+",
+            Pattern.CASE_INSENSITIVE);
+    private static final Pattern UNWANTED_SYMBOLS_PATTERN = Pattern.compile("[#%]", Pattern.CASE_INSENSITIVE);
+    private static final Pattern NON_ALPHANUMERIC_PATTERN = Pattern.compile("[^a-zA-Z\\s]", Pattern.CASE_INSENSITIVE);
+    private static final Pattern SPECIFIC_PATTERNS_PATTERN = Pattern.compile("(nbsp|font|target|color)[^\\s]*", Pattern.CASE_INSENSITIVE);
 
-    public List<String> getTopKeywords(final List<Item> rssFeedItems) {
-        final Map<String, Integer> keywordFrequencyMap = rssFeedItems.stream()
-                .flatMap(item -> {
-                    final String itemContent = item.getTitle() + " " + item.getDescription();
-                    return Arrays.stream(itemContent.toLowerCase()
-                            .replaceAll("[^a-zA-Z ]", "")
-                            .split("\\s+"));
-                })
-                .filter(word -> !Arrays.stream(stopwords.split(",")).toList().contains(word))
-                .collect(Collectors.toMap(word -> word, word -> 1, Integer::sum));
 
-        List<Map.Entry<String, Integer>> sortedList = keywordFrequencyMap.entrySet().stream()
-                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
-                .toList();
 
-        return sortedList.stream().limit(3).map(Map.Entry::getKey).toList();
+    public Map<String, Set<String>> getFeedKeywords(final List<Item> rssFeedItems) {
+        return rssFeedItems.stream()
+                .collect(Collectors.groupingBy(
+                        item -> item.getChannel().getTitle(),
+                        Collectors.flatMapping(
+                                item -> {
+                                    final String itemContent = item.getTitle() + " " + item.getDescription();
+                                    final String cleanContent = cleanText(itemContent);
+                                    final Sentence sentence = new Sentence(cleanContent);
+                                    return sentence.words().stream()
+                                            .filter(word -> sentence.posTag(sentence.words().indexOf(word)).startsWith("NN"))
+                                            .map(String::toLowerCase);
+                                    },
+                                Collectors.toSet()
+                        )
+                ));
+    }
+
+    private String cleanText(String text) {
+        // Remove URLs
+        text = URL_PATTERN.matcher(text).replaceAll("");
+        // Remove unwanted symbols
+        text = UNWANTED_SYMBOLS_PATTERN.matcher(text).replaceAll("");
+        // Remove non-alphanumeric characters except spaces
+        text = NON_ALPHANUMERIC_PATTERN.matcher(text).replaceAll("");
+        // Remove specific unwanted patterns
+        text = SPECIFIC_PATTERNS_PATTERN.matcher(text).replaceAll("");
+        // Remove extra whitespace
+        text = text.trim().replaceAll("\\s+", " ");
+        return text;
     }
 }

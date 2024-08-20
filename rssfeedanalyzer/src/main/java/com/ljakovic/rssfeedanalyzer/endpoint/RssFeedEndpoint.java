@@ -29,7 +29,11 @@ public class RssFeedEndpoint {
     )
     public ResponseEntity<List<String>> getHotTopics() {
         List<Item> rssItems = rssFeedService.getRssFeedItems(
-                List.of("https://news.google.com/news?cf=all&hl=en&pz=1&ned=us&output=rss"));
-        return ResponseEntity.ok(keywordUtil.getTopKeywords(rssItems));
+                List.of("https://news.google.com/news?cf=all&hl=en&pz=1&ned=us&output=rss", "https://feeds.megaphone.fm/newheights"));
+        keywordUtil.getFeedKeywords(rssItems).forEach((channel, keywords) -> {
+            System.out.println("Channel: " + channel);
+            System.out.println("Keywords: " + keywords);
+        });
+        return ResponseEntity.ok().build();
     }
 }
