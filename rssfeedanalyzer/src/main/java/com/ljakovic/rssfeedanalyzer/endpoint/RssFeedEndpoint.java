@@ -4,6 +4,7 @@ import com.apptasticsoftware.rssreader.Item;
 import com.ljakovic.rssfeedanalyzer.service.RssFeedService;
 import com.ljakovic.rssfeedanalyzer.util.KeywordUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,11 +26,12 @@ public class RssFeedEndpoint {
         this.keywordUtil = keywordUtil;
     }
     @PostMapping(
-            value = "/analyse/new"
+            value = "/analyse/new",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<List<String>> getHotTopics() {
-        List<Item> rssItems = rssFeedService.getRssFeedItems(
-                List.of("https://news.google.com/news?cf=all&hl=en&pz=1&ned=us&output=rss", "https://feeds.megaphone.fm/newheights"));
+    public ResponseEntity<List<String>> getHotTopics(List<String> rssUrls) {
+        List<Item> rssItems = rssFeedService.getRssFeedItems(rssUrls);
         keywordUtil.getFeedKeywords(rssItems).forEach((channel, keywords) -> {
             System.out.println("Channel: " + channel);
             System.out.println("Keywords: " + keywords);
