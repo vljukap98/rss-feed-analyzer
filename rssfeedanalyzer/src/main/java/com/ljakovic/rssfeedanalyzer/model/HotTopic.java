@@ -1,5 +1,6 @@
 package com.ljakovic.rssfeedanalyzer.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -13,8 +14,9 @@ public class HotTopic {
     private Long id;
     private String name;
     private Integer occurrences;
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "hotTopic", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "hotTopic", cascade = CascadeType.ALL)
     private List<Article> articles;
+    @JsonIgnore
     @ManyToOne
     private Analysis analysis;
 

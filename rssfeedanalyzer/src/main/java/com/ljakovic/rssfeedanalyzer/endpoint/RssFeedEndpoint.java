@@ -1,16 +1,17 @@
 package com.ljakovic.rssfeedanalyzer.endpoint;
 
 import com.apptasticsoftware.rssreader.Item;
+import com.ljakovic.rssfeedanalyzer.model.Analysis;
+import com.ljakovic.rssfeedanalyzer.model.Article;
+import com.ljakovic.rssfeedanalyzer.repository.AnalysisRepository;
+import com.ljakovic.rssfeedanalyzer.repository.ArticleRepository;
 import com.ljakovic.rssfeedanalyzer.service.AnalysisService;
 import com.ljakovic.rssfeedanalyzer.service.RssFeedService;
 import com.ljakovic.rssfeedanalyzer.util.KeywordUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -19,11 +20,13 @@ import java.util.List;
 public class RssFeedEndpoint {
 
     private final AnalysisService analysisService;
+    private final AnalysisRepository articleRepo;
 
-    @Autowired
-    public RssFeedEndpoint(AnalysisService analysisService) {
+    public RssFeedEndpoint(AnalysisService analysisService, AnalysisRepository articleRepo) {
         this.analysisService = analysisService;
+        this.articleRepo = articleRepo;
     }
+
     @PostMapping(
             value = "/analyse/new",
             consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -32,5 +35,13 @@ public class RssFeedEndpoint {
     public ResponseEntity<Long> getHotTopics(@RequestBody List<String> rssUrls) {
 
         return ResponseEntity.ok(analysisService.analyse(rssUrls));
+    }
+
+    @GetMapping(
+            value = "/frequency/{id}",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<Analysis> getTopArticles(@PathVariable Long id) {
+        return ResponseEntity.ok(articleRepo.findById(id).orElse(null));
     }
 }

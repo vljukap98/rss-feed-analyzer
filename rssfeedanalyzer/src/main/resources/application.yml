@@ -11,3 +11,16 @@ spring:
     hibernate:
       ddl-auto: create-drop
     defer-datasource-initialization: true
+
+#spring:
+#  application:
+#    name: rssfeedanalyzer
+#  datasource:
+#    url: jdbc:postgresql://localhost:5432/test
+#    #driver-class-name: org.postgresql.Driver
+#    username: postgres
+#    password: postgres
+#  jpa:
+#    hibernate:
+#      ddl-auto: create-drop
+#    database-platform: org.hibernate.dialect.PostgreSQLDialect

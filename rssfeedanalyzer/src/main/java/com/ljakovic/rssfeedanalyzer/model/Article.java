@@ -1,5 +1,6 @@
 package com.ljakovic.rssfeedanalyzer.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -11,10 +12,14 @@ public class Article {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(length = 512)
     private String title;
+    @Column(length = 4096)
     private String description;
+    @Column(length = 2048)
     private String link;
     private String rssUrl;
+    @JsonIgnore
     @ManyToOne
     private HotTopic hotTopic;
 

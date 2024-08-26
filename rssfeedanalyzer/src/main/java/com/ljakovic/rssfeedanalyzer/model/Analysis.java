@@ -14,7 +14,7 @@ public class Analysis {
     private Long id;
     private Date dateCreated;
     private String rssUrls;
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "analysis", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "analysis", cascade = CascadeType.ALL)
     private List<HotTopic> hotTopics;
 
     public Analysis() {
