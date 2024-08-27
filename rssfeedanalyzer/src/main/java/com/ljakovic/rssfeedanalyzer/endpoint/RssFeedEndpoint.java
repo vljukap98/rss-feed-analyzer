@@ -1,14 +1,8 @@
 package com.ljakovic.rssfeedanalyzer.endpoint;
 
-import com.apptasticsoftware.rssreader.Item;
-import com.ljakovic.rssfeedanalyzer.model.Analysis;
 import com.ljakovic.rssfeedanalyzer.model.Article;
-import com.ljakovic.rssfeedanalyzer.repository.AnalysisRepository;
 import com.ljakovic.rssfeedanalyzer.repository.ArticleRepository;
 import com.ljakovic.rssfeedanalyzer.service.AnalysisService;
-import com.ljakovic.rssfeedanalyzer.service.RssFeedService;
-import com.ljakovic.rssfeedanalyzer.util.KeywordUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,11 +14,11 @@ import java.util.List;
 public class RssFeedEndpoint {
 
     private final AnalysisService analysisService;
-    private final AnalysisRepository articleRepo;
+    private final ArticleRepository articleRepo;
 
-    public RssFeedEndpoint(AnalysisService analysisService, AnalysisRepository articleRepo) {
+    public RssFeedEndpoint(AnalysisService analysisService, ArticleRepository articleRepo1) {
         this.analysisService = analysisService;
-        this.articleRepo = articleRepo;
+        this.articleRepo = articleRepo1;
     }
 
     @PostMapping(
@@ -41,7 +35,7 @@ public class RssFeedEndpoint {
             value = "/frequency/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<Analysis> getTopArticles(@PathVariable Long id) {
-        return ResponseEntity.ok(articleRepo.findById(id).orElse(null));
+    public ResponseEntity<List<Article>> getTopArticles(@PathVariable Long id) {
+        return ResponseEntity.ok(articleRepo.findTopArticlesByAnalysis(id).stream().limit(3).toList());
     }
 }

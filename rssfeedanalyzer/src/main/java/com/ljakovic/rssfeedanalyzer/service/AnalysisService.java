@@ -43,29 +43,36 @@ public class AnalysisService {
         final Analysis analysis = new Analysis();
         analysis.setDateCreated(new Date());
         analysis.setRssUrls(String.join(";;", rssUrls));
-        analysis.setHotTopics(mapHotTopics(hotTopics));
+
+        List<HotTopic> hotTopicList = mapHotTopics(hotTopics);
+
+        analysis.setHotTopics(hotTopicList);
 
         final Analysis analysis1 = analysisRepo.save(analysis);
+        hotTopicList.forEach(ht -> {
+            ht.setAnalysis(analysis);
+            hotTopicRepo.save(ht);
+        });
 
         return analysis1.getId();
     }
 
     private List<HotTopic> mapHotTopics(Map<String, HashSet<KeywordDto>> feedHotTopics) {
-        final List<HotTopic> hotTopicList = new ArrayList<>();
-        feedHotTopics.forEach((k,v) -> {
-            v.forEach(kw -> {
-                    final HotTopic hotTopic = new HotTopic();
-                    hotTopic.setName(kw.word());
-                    hotTopic.setOccurrences(kw.occurrences());
-                    final Article article = mapArticle(kw.item());
+        final List<Long> hotTopicIds = new ArrayList<>();
+        feedHotTopics.forEach((k,v) -> v.forEach(kw -> {
+            final HotTopic hotTopic = new HotTopic();
+            hotTopic.setName(kw.word());
+            hotTopic.setOccurrences(kw.occurrences());
+            final Article article = mapArticle(kw.item());
 
-                    hotTopic.setArticle(article);
-                    hotTopicRepo.save(hotTopic);
-                    hotTopicList.add(hotTopic);
-            });
+            hotTopic.setArticle(article);
+            article.setHotTopic(hotTopic);
+            hotTopicRepo.save(hotTopic);
+            articleRepo.save(article);
+            hotTopicIds.add(hotTopic.getId());
+        }));
 
-        });
-        return hotTopicList;
+        return hotTopicRepo.findAllById(hotTopicIds);
     }
 
     private Article mapArticle(Item item) {
@@ -73,12 +80,9 @@ public class AnalysisService {
         if (item.getTitle().isPresent()) {
             article.setTitle(item.getTitle().get());
         }
-        if (item.getDescription().isPresent()) {
-            //article.setDescription(item.getDescription().get());
-        }
         if (item.getLink().isPresent()) {
             article.setLink(item.getLink().get());
         }
-        return articleRepo.save(article);
+        return article;
     }
 }

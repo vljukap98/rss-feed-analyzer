@@ -1,0 +1,63 @@
+{
+	"info": {
+		"_postman_id": "6867b502-f2a5-45b8-ae2e-f9b578485b5c",
+		"name": "rss-feed-analyzer",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "14590658"
+	},
+	"item": [
+		{
+			"name": "Analyse",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[\n    \"https://moxie.foxnews.com/google-publisher/tech.xml\",\n    \"https://news.google.com/news?cf=all&hl=en&pz=1&ned=us&output=rss\"\n\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/v1/rss/analyse/new",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"rss",
+						"analyse",
+						"new"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Frequency",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/v1/rss/frequency/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"rss",
+						"frequency",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
