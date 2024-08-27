@@ -14,8 +14,8 @@ public class HotTopic {
     private Long id;
     private String name;
     private Integer occurrences;
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "hotTopic", cascade = CascadeType.ALL)
-    private List<Article> articles;
+    @OneToOne(fetch = FetchType.EAGER, mappedBy = "hotTopic", cascade = CascadeType.ALL)
+    private Article article;
     @JsonIgnore
     @ManyToOne
     private Analysis analysis;
@@ -23,11 +23,11 @@ public class HotTopic {
     public HotTopic() {
     }
 
-    public HotTopic(Long id, String name, Integer occurrences, List<Article> articles, Analysis analysis) {
+    public HotTopic(Long id, String name, Integer occurrences, Article article, Analysis analysis) {
         this.id = id;
         this.name = name;
         this.occurrences = occurrences;
-        this.articles = articles;
+        this.article = article;
         this.analysis = analysis;
     }
 
@@ -55,12 +55,12 @@ public class HotTopic {
         this.occurrences = occurrences;
     }
 
-    public List<Article> getArticles() {
-        return articles;
+    public Article getArticle() {
+        return article;
     }
 
-    public void setArticles(List<Article> articles) {
-        this.articles = articles;
+    public void setArticle(Article article) {
+        this.article = article;
     }
 
     public Analysis getAnalysis() {

@@ -51,21 +51,17 @@ public class AnalysisService {
     }
 
     private List<HotTopic> mapHotTopics(Map<String, HashSet<KeywordDto>> feedHotTopics) {
-        final Map<String, List<HotTopic>> hotTopicMap = new HashMap<>();
         final List<HotTopic> hotTopicList = new ArrayList<>();
         feedHotTopics.forEach((k,v) -> {
             v.forEach(kw -> {
-                hotTopicMap.computeIfAbsent(kw.word(), s -> {
                     final HotTopic hotTopic = new HotTopic();
                     hotTopic.setName(kw.word());
                     hotTopic.setOccurrences(kw.occurrences());
-                    if (hotTopic.getArticles() == null) {
-                        hotTopic.setArticles(new ArrayList<>());
-                    }
-                    hotTopic.getArticles().add(mapArticle(kw.item()));
-                    hotTopicList.add(hotTopicRepo.save(hotTopic));
-                    return hotTopicList;
-                });
+                    final Article article = mapArticle(kw.item());
+
+                    hotTopic.setArticle(article);
+                    hotTopicRepo.save(hotTopic);
+                    hotTopicList.add(hotTopic);
             });
 
         });

@@ -20,7 +20,7 @@ public class Article {
     private String link;
     private String rssUrl;
     @JsonIgnore
-    @ManyToOne
+    @OneToOne
     private HotTopic hotTopic;
 
     public Article() {
